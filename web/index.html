@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>經絡診斷系統</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- 添加 MediaPipe 相關庫 -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- 更新 Favicon 為柔和色調的蝴蝶圖示 -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath fill='%2378A6C8' d='M6 0c-1.5 0-3 1.5-3 3 0 1.4 1.1 2.5 2.5 2.9L3 10.5l3-2 3 2-2.5-4.6c1.4-.4 2.5-1.5 2.5-2.9 0-1.5-1.5-3-3-3zm0 2c.6 0 1 .4 1 1s-.4 1-1 1-1-.4-1-1 .4-1 1-1zM1.5 4C.1 4-1 5.1-1 6.5c0 1.3 1 2.4 2.3 2.5L-1 13h3l2-3-2.5-3.5c1.4-.1 2.5-1.2 2.5-2.5C4 5.1 2.9 4 1.5 4zm9 0C9.1 4 8 5.1 8 6.5c0 1.3 1.1 2.4 2.5 2.5L8 13h3l-2.3-4c1.3-.1 2.3-1.2 2.3-2.5C11 5.1 9.9 4 8.5 4z'/%3E%3C/svg%3E"/>
+    <link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAA7AAAAOwBeShxvQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAMASURBVFiF7ZZNaBNBFMd/M9ndbBoSm1YpVkwh4kHFj4N4ELwUBUWrHjx4EjyJFx/48WI9qQdBPIjgwYNePHgQRBAUwaJ48CBI0YNIwEQhTdskTbubj92ZeQe3JLvJbrKbevGBj515M2/e/82b93Y2wn/ucLSmABF5LiKfi4jFRYRnInJxTQEiclVEHBHJiMiMiGRFxBaRByKyfU0AIrJZRF6KyLSIjIvIhIiMgXEdmzJgARaRWRMRGZEJEfIvJVRL6JyE8R6V8TgIi0i8hbEflVBvBJRL6LyG8ROb0mABFpF5H3IvK7DOC9iIyLyB8ROb8mABFpE5F3IvKnDOC1iEyKyF8RubwmABGJicjbEoAXIjIlIrMicn1NACLSIiKvROSfiDwTkRkRsUTk4ZoCVHNE5JaI7F1XgIjsF5HT6wogIrtFZGhdAURkh4gcWVcAEdkmIv3rCiAiURE5uK4AIhIWkb51BRCRoIjsWleAf+5/gDUGCDmFgtLtdkMYRgDDMFwHKKXwer0EAgG8Xi+GYeD1evH5fPj9fvx+P4ZhEAgECAaDhEIhwuEw4XCYSCRCJBIhHA4TCoUIBoMEAgH8fj8+nw+v14thGJimid/vx+fzYZomhmFgmiYejwePx4NpmgQCAUzTJBgMEgwGiUQiRKNRotEo0WiUSCRCOBwmFAoRDAYxTROv14vH48E0TXw+H6ZpEggECAaDhEIhIpEI0WiUWCxGLBYjGo0SiUSIRCKEw2FCoRDBYJBAIIDP58Pj8WCaJn6/H9M0CQaDhMNhotEosViMWCxGW1sb0WiUcDhMKBQiGAwSCATw+/2Ypuks4PP5ME2TYDBIOBwmGo0Si8WIx+O0t7fT3t5OPB6nra2NaDRKJBIhHA4TDAYJBAKYponH48HpdGIYBqZpEggECIfDRKNR4vE4HR0ddHZ20tHRQTweJxaLEY1GiUQihEIhAoEAXq8X0zQxDAOPx4NpmgQCAUKhENFolHg8TmdnJ11dXXR1ddHR0UE8HicWixGNRolEIoRCIQKBAKZpOgP4DzrrYY8r6TGXAAAAAElFTkSuQmCC"/>
+    <link rel="icon" type="image/png" sizes="16x16" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAbwAAAG8B8aLcQwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAGESURBVDiNY2CgEjh+/LjwvXv3VjIxMUkzMDDwMzIysjIyMrIwMjKyMTExsTAyMrIxMTGxMTMzsjIxMbEyMzOzMTMzszIzM7MyMzOzMTMzszIzM7MxMTGxMjIysjIwMPAzMDDwMzIyCjMyMvI/fPhwBQMDA8P///8ZGBgYGP78+cPw9+9fhj9//jD8+fOH4d+/fwz///9n+P//P8P///8Z/v37x/D371+GP3/+MPz+/Zvhz58/DH/+/GH4/fs3w+/fvxl+//7N8OvXL4Zfv34x/Pr1i+HXr18Mv379Yvj9+zfDnz9/GH7//s3w58+fEoAAAwPDQQYGBg0GBgYOBgYGVgYGBlYGBgZWRkZGFkZGRhZGRkYWJiYmFiYmJhYmJiYWZmZmFmZmZhZmZmYWJiYmFkZGRhYGBgZWBgYGVgYGBg4GBgYOBgYGdgYGBnYGBgYOBgYGDgYGBg4GBgYOBgYGDgYGBg4GBgYOBgYGDgYGBg4GBgYOBgYGDgYGBg4A9vhP2r6KQuwAAAAASUVORK5CYII="/>
+</head>
+<body>
+    <div class="background-design"></div>
+    <div class="container">
+        <div class="main-panel">
+            <header>
+                <div class="logo">
+                    <i class="fas fa-hand-holding-medical"></i>
+                </div>
+                <h1>經絡診斷系統</h1>
+                <p class="subtitle">Traditional Chinese Medicine Diagnosis System</p>
+            </header>
+
+            <div class="control-section">
+                <div class="btn-group">
+                    <button class="btn symptom-btn">症狀查找</button>
+                    <button class="btn meridian-btn">經絡學習</button>
+                </div>
+            </div>
+
+            <div class="camera-section">
+                <div class="camera-container">
+                    <video id="video"></video>
+                    <canvas id="output-canvas"></canvas>
+                    <div id="acupoint-name" class="acupoint-title">
+                        <!-- 穴位名稱會在這裡顯示 -->
+                    </div>
+                    <div id="palm-notification" class="center-guide palm-guide">
+                        請將手掌心朝向鏡頭
+                    </div>
+                    <div id="hand-position-guide" class="center-guide">
+                        請將手完整置於畫面中
+                    </div>
+                    <div id="error-message" style="display: none;" class="error-message">
+                        無法存取攝像頭，請確認權限設定。
+                    </div>
+                    <div id="timer" class="timer">3</div>
+                    <div id="massage-complete" class="massage-complete" style="display: none;">
+                        按摩結束
+                    </div>
+                </div>
+            </div>
+            
+            <div id="symptom-options" class="options-menu" style="display: none;">
+                <div class="options-title">選擇顯示穴位的手</div>
+                <div class="hand-choice">
+                    <button class="hand-btn" data-hand="left">左手</button>
+                    <button class="hand-btn" data-hand="right">右手</button>
+                </div>
+                <div class="symptom-list" style="display: none;">
+                    <div class="options-title">症狀選擇</div>
+                    <button class="option-btn">頭痛</button>
+                    <button class="option-btn">牙齒痛</button>
+                    <button class="option-btn" data-acupoint="魚際穴" data-location="yujixue">哮喘</button>
+                    <button class="option-btn">經痛</button>
+                </div>
+            </div>
+            
+            <div id="meridian-options" class="options-menu" style="display: none;">
+                <div class="options-title">經絡選擇</div>
+                <button class="option-btn">手太陰肺經</button>
+                <button class="option-btn">手陽明大腸經</button>
+                <button class="option-btn">手厥陰心包經</button>
+                <button class="option-btn">手少陽三焦經</button>
+                <button class="option-btn">手少陰心經</button>
+                <button class="option-btn">手太陽小腸經</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('output-canvas');
+        const errorMessage = document.getElementById('error-message');
+        const ctx = canvas.getContext('2d');
+
+        // ===== Canvas 設置 =====
+        function setupCanvas() {
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            
+            // 根據設備設置不同的解析度
+            if (isIOS) {
+                canvas.width = 720;   // iOS 使用較小的解析度
+                canvas.height = 1280; // 保持 9:16 比例
+            } else {
+                canvas.width = 1280;  // 其他設備使用標準 HD
+                canvas.height = 720;  // 16:9 比例
+            }
+        }
+
+        // 初始化 MediaPipe Hands
+        const hands = new Hands({
+            locateFile: (file) => {
+                return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
+            }
+        });
+
+        // 配置 Hands
+        hands.setOptions({
+            maxNumHands: 2,
+            modelComplexity: 1,
+            minDetectionConfidence: 0.5,
+            minTrackingConfidence: 0.5
+        });
+
+        // 添加狀態變數
+        let showFatiguePoint = false;
+        let showPericardiumPoints = false;  // 新增手厥陰心包經狀態
+        let activeHand = null; // 'left' 或 'right'
+        let activeSymptom = null;
+        let selectedHand = null;
+        let isPalmVisible = false;
+
+        // 添加經絡學習模式標記
+        let isMeridianLearningMode = false;
+
+        // 添加按摩檢測相關變數
+        let isMassaging = false;
+
+        // 添加計時相關變數
+        let isTimerRunning = false;
+        let timerInterval = null;
+        let currentTime = 3;
+
+        // 修改檢查點重合的函數，增加判定距離
+        function checkPointsOverlap(x1, y1, x2, y2, threshold = 40) {  // 增加 threshold 值
+            const distance = Math.sqrt(
+                Math.pow((x1 - x2) * canvas.width, 2) + 
+                Math.pow((y1 - y2) * canvas.height, 2)
+            );
+            return distance < threshold;
+        }
+
+        // 修改手掌朝向的判斷函數
+        function checkPalmVisibility(landmarks, handedness, needBackSide = false) {
+            const indexFingerPIP = landmarks[2];
+            const ringFingerPIP = landmarks[17];
+            
+            if (needBackSide) {
+                // 手背朝向判斷（與手掌朝向相反）
+                if (handedness === 'left') {
+                    return indexFingerPIP.x > ringFingerPIP.x;
+                } else {
+                    return indexFingerPIP.x < ringFingerPIP.x;
+                }
+            } else {
+                // 手掌朝向判斷
+                if (handedness === 'left') {
+                    return indexFingerPIP.x < ringFingerPIP.x;
+                } else {
+                    return indexFingerPIP.x > ringFingerPIP.x;
+                }
+            }
+        }
+
+        // 修改手部判別邏輯
+        function getHandedness(handedness, landmarks) {
+            // 在鏡像模式下，需要反轉左右手的判斷
+            const isLeft = handedness.toLowerCase() === 'left';
+            return isLeft ? 'right' : 'left';  // 交換左右手
+        }
+
+        // 更新穴位名稱顯示
+        function updateAcupointTitle(name) {
+            const titleElement = document.getElementById('acupoint-name');
+            if (name) {
+                titleElement.textContent = name;
+                titleElement.style.display = 'block';
+            } else {
+                titleElement.style.display = 'none';
+            }
+        }
+
+        // 處理結果
+        hands.onResults((results) => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 直接繪製視訊
+            ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
+
+            const handGuide = document.getElementById('hand-position-guide');
+            
+            // 如果沒有檢測到手
+            if (!results.multiHandLandmarks || results.multiHandLandmarks.length === 0) {
+                // 在症狀查找模式下，顯示引導文字
+                if (!isMeridianLearningMode && (showFatiguePoint || showPericardiumPoints)) {
+                    handGuide.style.display = 'flex';
+                    updateAcupointTitle('');  // 清除穴位名稱
+                }
+                // 在選擇模式下也顯示引導文字
+                else if (!showFatiguePoint && !showPericardiumPoints) {
+                    handGuide.style.display = 'flex';
+                } else {
+                    handGuide.style.display = 'none';
+                }
+            } else {
+                handGuide.style.display = 'none';
+            }
+
+            if (results.multiHandLandmarks) {
+                let foundTargetHand = false;
+                let massagingHand = null;
+                let targetHand = null;
+                let massagingFingerTip = null;
+                let acupointPosition = null;
+
+                // 先找到目標手和按摩手
+                for (let i = 0; i < results.multiHandedness.length; i++) {
+                    const landmarks = results.multiHandLandmarks[i];
+                    const handedness = getHandedness(results.multiHandedness[i].label, landmarks);
+                    
+                    if (!isMeridianLearningMode) {
+                        if (handedness === activeHand) {
+                            targetHand = landmarks;
+                        } else {
+                            massagingHand = landmarks;
+                            massagingFingerTip = landmarks[8];
+                        }
+                    }
+
+                    // 在症狀查找模式下
+                    if (!isMeridianLearningMode && handedness === activeHand) {
+                        foundTargetHand = true;
+                        isPalmVisible = checkPalmVisibility(landmarks, handedness);
+                        const notification = document.getElementById('palm-notification');
+                        
+                        if (showFatiguePoint) {
+                            if (isPalmVisible) {
+                                notification.style.display = 'none';
+                                updateAcupointTitle('勞宮穴');  // 只在手掌心可見時顯示穴位名稱
+                                
+                                // 計算並繪製疲勞穴位
+                                const centerX = (landmarks[0].x + landmarks[5].x + landmarks[9].x) / 3;
+                                const centerY = (landmarks[0].y + landmarks[5].y + landmarks[9].y) / 3;
+                                
+                                // 繪製藍點
+                                ctx.beginPath();
+                                ctx.arc(
+                                    centerX * canvas.width,
+                                    centerY * canvas.height,
+                                    8,
+                                    0,
+                                    2 * Math.PI
+                                );
+                                ctx.fillStyle = '#0000FF';
+                                ctx.fill();
+                            } else {
+                                notification.style.display = 'block';
+                                updateAcupointTitle('');  // 手背時清除穴位名稱
+                            }
+                        }
+                        
+                        if (showPericardiumPoints) {
+                            if (isPalmVisible) {
+                                notification.style.display = 'none';
+                                updateAcupointTitle('勞宮穴、中衝穴');
+                                
+                                // 計算穴位位置
+                                const laoGongX = (landmarks[0].x + landmarks[5].x + landmarks[9].x) / 3;
+                                const laoGongY = (landmarks[0].y + landmarks[5].y + landmarks[9].y) / 3;
+                                const zhongChongX = landmarks[12].x;
+                                const zhongChongY = landmarks[12].y;
+
+                                // 繪製連接線
+                                ctx.beginPath();
+                                ctx.moveTo(laoGongX * canvas.width, laoGongY * canvas.height);
+                                ctx.lineTo(zhongChongX * canvas.width, zhongChongY * canvas.height);
+                                ctx.strokeStyle = '#0000FF';
+                                ctx.lineWidth = 2;
+                                ctx.stroke();
+
+                                // 繪製穴位點
+                                ctx.beginPath();
+                                ctx.arc(laoGongX * canvas.width, laoGongY * canvas.height, 8, 0, 2 * Math.PI);
+                                ctx.fillStyle = '#0000FF';
+                                ctx.fill();
+
+                                ctx.beginPath();
+                                ctx.arc(zhongChongX * canvas.width, zhongChongY * canvas.height, 8, 0, 2 * Math.PI);
+                                ctx.fillStyle = '#0000FF';
+                                ctx.fill();
+                            } else {
+                                notification.style.display = 'block';
+                                updateAcupointTitle('');
+                            }
+                        }
+                    }
+                    // 在經絡學習模式下
+                    else if (isMeridianLearningMode && showPericardiumPoints) {
+                        isPalmVisible = checkPalmVisibility(landmarks, handedness);
+                        const notification = document.getElementById('palm-notification');
+                        
+                        if (isPalmVisible) {
+                            notification.style.display = 'none';
+                            
+                            // 計算穴位位置
+                            const laoGongX = (landmarks[0].x + landmarks[5].x + landmarks[9].x) / 3;
+                            const laoGongY = (landmarks[0].y + landmarks[5].y + landmarks[9].y) / 3;
+                            const zhongChongX = landmarks[12].x;
+                            const zhongChongY = landmarks[12].y;
+
+                            // 繪製連接線
+                            ctx.beginPath();
+                            ctx.moveTo(laoGongX * canvas.width, laoGongY * canvas.height);
+                            ctx.lineTo(zhongChongX * canvas.width, zhongChongY * canvas.height);
+                            ctx.strokeStyle = '#0000FF';
+                            ctx.lineWidth = 2;
+                            ctx.stroke();
+
+                            // 繪製穴位點
+                            ctx.beginPath();
+                            ctx.arc(laoGongX * canvas.width, laoGongY * canvas.height, 8, 0, 2 * Math.PI);
+                            ctx.fillStyle = '#0000FF';
+                            ctx.fill();
+
+                            ctx.beginPath();
+                            ctx.arc(zhongChongX * canvas.width, zhongChongY * canvas.height, 8, 0, 2 * Math.PI);
+                            ctx.fillStyle = '#0000FF';
+                            ctx.fill();
+
+                            // 修改文字顯示位置的計算方式
+                            const textOffset = 25;
+                            ctx.font = '24px Arial';
+                            ctx.fillStyle = '#0000FF';
+                            ctx.textAlign = 'left';
+                            
+                            // 直接使用原始座標，不需要鏡像處理
+                            ctx.fillText('勞宮穴', 
+                                (laoGongX * canvas.width) + textOffset,
+                                (laoGongY * canvas.height) + textOffset
+                            );
+                            ctx.fillText('中衝穴', 
+                                (zhongChongX * canvas.width) + textOffset,
+                                (zhongChongY * canvas.height) + textOffset
+                            );
+                        } else {
+                            notification.style.display = 'block';
+                        }
+                    }
+                }
+
+                // 如果在症狀查找模式下沒有找到目標手
+                if (!isMeridianLearningMode && !foundTargetHand && (showFatiguePoint || showPericardiumPoints)) {
+                    handGuide.style.display = 'flex';
+                    updateAcupointTitle('');  // 清除穴位名稱
+                }
+
+                // 處理目標手的顯示
+                if (targetHand && massagingFingerTip && !isMeridianLearningMode) {
+                    // 繪製食指指頭的黃點
+                    ctx.beginPath();
+                    ctx.arc(
+                        massagingFingerTip.x * canvas.width,
+                        massagingFingerTip.y * canvas.height,
+                        6,
+                        0,
+                        2 * Math.PI
+                    );
+                    ctx.fillStyle = '#FFFF00';
+                    ctx.fill();
+
+                    if (showFatiguePoint && isPalmVisible) {
+                        // 計算勞宮穴位置
+                        const centerX = (targetHand[0].x + targetHand[5].x + targetHand[9].x) / 3;
+                        const centerY = (targetHand[0].y + targetHand[5].y + targetHand[9].y) / 3;
+
+                        if (checkPointsOverlap(
+                            massagingFingerTip.x,
+                            massagingFingerTip.y,
+                            centerX,
+                            centerY
+                        )) {
+                            // 當食指與穴位重合時
+                            if (!isMassaging) {
+                                isMassaging = true;
+                                startTimer();  // 啟動計時器
+                            }
+                        } else {
+                            if (isMassaging) {
+                                isMassaging = false;
+                                resetTimer();  // 重置計時器
+                            }
+                        }
+                    }
+
+                    if (showPericardiumPoints && isPalmVisible) {
+                        // 計算兩個穴位位置
+                        const laoGongX = (targetHand[0].x + targetHand[5].x + targetHand[9].x) / 3;
+                        const laoGongY = (targetHand[0].y + targetHand[5].y + targetHand[9].y) / 3;
+                        const zhongChongX = targetHand[12].x;
+                        const zhongChongY = targetHand[12].y;
+
+                        // 檢查與勞宮穴的重合
+                        if (checkPointsOverlap(
+                            massagingFingerTip.x,
+                            massagingFingerTip.y,
+                            laoGongX,
+                            laoGongY
+                        )) {
+                            if (!isMassaging) {
+                                isMassaging = true;
+                                startTimer();  // 啟動計時器
+                            }
+                        } else if (checkPointsOverlap(
+                            massagingFingerTip.x,
+                            massagingFingerTip.y,
+                            zhongChongX,
+                            zhongChongY
+                        )) {
+                            if (!isMassaging) {
+                                isMassaging = true;
+                                startTimer();  // 啟動計時器
+                            }
+                        } else {
+                            if (isMassaging) {
+                                isMassaging = false;
+                                resetTimer();  // 重置計時器
+                            }
+                        }
+                    }
+                }
+
+                // 修改魚際穴的顯示邏輯
+                if (targetHand) {
+                    if (activeSymptom === "魚際穴") {
+                        // 檢查手掌朝向
+                        isPalmVisible = checkPalmVisibility(targetHand, selectedHand);
+                        const palmNotification = document.getElementById('palm-notification');
+                        const acupointName = document.getElementById('acupoint-name');
+                        
+                        if (isPalmVisible) {
+                            // 手掌朝向正確時同時顯示穴位和文字
+                            palmNotification.style.display = 'none';
+                            acupointName.textContent = "魚際穴";
+                            acupointName.style.display = 'block';
+                            
+                            // 計算並顯示魚際穴
+                            const point1 = targetHand[1];
+                            const point2 = targetHand[2];
+                            
+                            // 計算中點A
+                            const midPointA = {
+                                x: (point1.x + point2.x) / 2,
+                                y: (point1.y + point2.y) / 2
+                            };
+                            
+                            // 計算魚際穴位置
+                            const yujiPoint = {
+                                x: (midPointA.x + point1.x) / 2,
+                                y: (midPointA.y + point1.y) / 2
+                            };
+
+                            // 繪製魚際穴
+                            ctx.beginPath();
+                            ctx.arc(yujiPoint.x * canvas.width, yujiPoint.y * canvas.height, 8, 0, 2 * Math.PI);
+                            ctx.fillStyle = '#0000FF';  // 藍色
+                            ctx.fill();
+                            
+                            // 檢查按摩動作
+                            if (massagingFingerTip) {
+                                // 繪製按摩手指的黃點
+                                ctx.beginPath();
+                                ctx.arc(
+                                    massagingFingerTip.x * canvas.width,
+                                    massagingFingerTip.y * canvas.height,
+                                    6,
+                                    0,
+                                    2 * Math.PI
+                                );
+                                ctx.fillStyle = '#FFFF00';  // 黃色
+                                ctx.fill();
+
+                                // 檢查重合
+                                if (checkPointsOverlap(yujiPoint.x, yujiPoint.y, massagingFingerTip.x, massagingFingerTip.y)) {
+                                    if (!isMassaging) {
+                                        isMassaging = true;
+                                        startTimer();  // 啟動計時器
+                                    }
+                                    // 顯示按摩效果
+                                    ctx.beginPath();
+                                    ctx.arc(
+                                        yujiPoint.x * canvas.width,
+                                        yujiPoint.y * canvas.height,
+                                        20,
+                                        0,
+                                        2 * Math.PI
+                                    );
+                                    ctx.strokeStyle = '#00FF00';  // 綠色
+                                    ctx.lineWidth = 3;
+                                    ctx.stroke();
+                                } else {
+                                    if (isMassaging) {
+                                        isMassaging = false;
+                                        resetTimer();  // 重置計時器
+                                    }
+                                }
+                            }
+                        } else {
+                            // 手掌朝向錯誤時同時隱藏穴位和文字
+                            palmNotification.style.display = 'block';
+                            acupointName.style.display = 'none';
+                        }
+                    }
+                } else {
+                    // 如果沒有檢測到手，也要隱藏文字
+                    if (activeSymptom === "魚際穴") {
+                        document.getElementById('acupoint-name').style.display = 'none';
+                    }
+                }
+
+                // 修改頭痛穴位的處理邏輯
+                if (targetHand) {
+                    if (activeSymptom === "頭痛穴位") {
+                        // 檢查手背朝向
+                        isPalmVisible = checkPalmVisibility(targetHand, selectedHand, true);
+                        const palmNotification = document.getElementById('palm-notification');
+                        const acupointName = document.getElementById('acupoint-name');
+                        
+                        if (isPalmVisible) {
+                            // 手背朝向正確時同時顯示穴位和文字
+                            palmNotification.style.display = 'none';
+                            acupointName.textContent = "液門穴";
+                            acupointName.style.display = 'block';
+                            
+                            // 繪製頭痛穴位（液門穴）
+                            ctx.beginPath();
+                            ctx.arc(
+                                targetHand[13].x * canvas.width,
+                                targetHand[13].y * canvas.height,
+                                8,
+                                0,
+                                2 * Math.PI
+                            );
+                            ctx.fillStyle = '#0000FF';
+                            ctx.fill();
+                            
+                            // 檢查按摩動作
+                            if (massagingFingerTip) {
+                                // 繪製按摩手指的黃點
+                                ctx.beginPath();
+                                ctx.arc(
+                                    massagingFingerTip.x * canvas.width,
+                                    massagingFingerTip.y * canvas.height,
+                                    6,
+                                    0,
+                                    2 * Math.PI
+                                );
+                                ctx.fillStyle = '#FFFF00';  // 黃色
+                                ctx.fill();
+
+                                // 檢查重合
+                                if (checkPointsOverlap(
+                                    targetHand[13].x,
+                                    targetHand[13].y,
+                                    massagingFingerTip.x,
+                                    massagingFingerTip.y
+                                )) {
+                                    if (!isMassaging) {
+                                        isMassaging = true;
+                                        startTimer();  // 啟動計時器
+                                    }
+                                    // 顯示按摩效果
+                                    ctx.beginPath();
+                                    ctx.arc(
+                                        targetHand[13].x * canvas.width,
+                                        targetHand[13].y * canvas.height,
+                                        20,
+                                        0,
+                                        2 * Math.PI
+                                    );
+                                    ctx.strokeStyle = '#00FF00';  // 綠色
+                                    ctx.lineWidth = 3;
+                                    ctx.stroke();
+                                } else {
+                                    if (isMassaging) {
+                                        isMassaging = false;
+                                        resetTimer();  // 重置計時器
+                                    }
+                                }
+                            }
+                        } else {
+                            // 手背朝向錯誤時同時隱藏穴位和文字
+                            palmNotification.style.display = 'block';
+                            acupointName.style.display = 'none';
+                        }
+                    }
+                }
+                // 修改頭痛穴位的處理邏輯
+                // if (targetHand) {
+                //     if (activeSymptom === "頭暈穴位") {
+                //         // 檢查手背朝向
+                //         isPalmVisible = checkPalmVisibility(targetHand, selectedHand, true);
+                //         const palmNotification = document.getElementById('palm-notification');
+                //         const acupointName = document.getElementById('acupoint-name');
+                        
+                //         if (isPalmVisible) {
+                //             // 手背朝向正確時同時顯示穴位和文字
+                //             palmNotification.style.display = 'none';
+                //             acupointName.textContent = "太沖穴";
+                //             acupointName.style.display = 'block';
+                            
+                //             // 繪製頭痛穴位（液門穴）
+                //             ctx.beginPath();
+                //             ctx.arc(
+                //                 targetHand[13].x * canvas.width,
+                //                 targetHand[13].y * canvas.height,
+                //                 8,
+                //                 0,
+                //                 2 * Math.PI
+                //             );
+                //             ctx.fillStyle = '#0000FF';
+                //             ctx.fill();
+                            
+                //             // 檢查按摩動作
+                //             if (massagingFingerTip) {
+                //                 // 繪製按摩手指的黃點
+                //                 ctx.beginPath();
+                //                 ctx.arc(
+                //                     massagingFingerTip.x * canvas.width,
+                //                     massagingFingerTip.y * canvas.height,
+                //                     6,
+                //                     0,
+                //                     2 * Math.PI
+                //                 );
+                //                 ctx.fillStyle = '#FFFF00';  // 黃色
+                //                 ctx.fill();
+
+                //                 // 檢查重合
+                //                 if (checkPointsOverlap(
+                //                     targetHand[13].x,
+                //                     targetHand[13].y,
+                //                     massagingFingerTip.x,
+                //                     massagingFingerTip.y
+                //                 )) {
+                //                     if (!isMassaging) {
+                //                         isMassaging = true;
+                //                         startTimer();  // 啟動計時器
+                //                     }
+                //                     // 顯示按摩效果
+                //                     ctx.beginPath();
+                //                     ctx.arc(
+                //                         targetHand[13].x * canvas.width,
+                //                         targetHand[13].y * canvas.height,
+                //                         20,
+                //                         0,
+                //                         2 * Math.PI
+                //                     );
+                //                     ctx.strokeStyle = '#00FF00';  // 綠色
+                //                     ctx.lineWidth = 3;
+                //                     ctx.stroke();
+                //                 } else {
+                //                     if (isMassaging) {
+                //                         isMassaging = false;
+                //                         resetTimer();  // 重置計時器
+                //                     }
+                //                 }
+                //             }
+                //         }
+                //     }
+                // }
+                // 修改經痛穴位的處理邏輯
+                if (targetHand) {
+                    if (activeSymptom === "經痛穴位") {
+                        // 檢查手背朝向
+                        isPalmVisible = checkPalmVisibility(targetHand, selectedHand, true);
+                        const palmNotification = document.getElementById('palm-notification');
+                        const acupointName = document.getElementById('acupoint-name');
+                        
+                        if (isPalmVisible) {
+                            // 手背朝向正確時同時顯示穴位和文字
+                            palmNotification.style.display = 'none';
+                            acupointName.textContent = "合谷穴";
+                            acupointName.style.display = 'block';
+                            
+                            // 繪製合谷穴
+                            ctx.beginPath();
+                            ctx.arc(
+                                targetHand[0].x * canvas.width,
+                                targetHand[0].y * canvas.height,
+                                8,
+                                0,
+                                2 * Math.PI
+                            );
+                            ctx.fillStyle = '#0000FF';
+                            ctx.fill();
+                            
+                            // 檢查按摩動作
+                            if (massagingFingerTip) {
+                                // 繪製按摩手指的黃點
+                                ctx.beginPath();
+                                ctx.arc(
+                                    massagingFingerTip.x * canvas.width,
+                                    massagingFingerTip.y * canvas.height,
+                                    6,
+                                    0,
+                                    2 * Math.PI
+                                );
+                                ctx.fillStyle = '#FFFF00';
+                                ctx.fill();
+
+                                // 檢查重合
+                                if (checkPointsOverlap(
+                                    targetHand[0].x,
+                                    targetHand[0].y,
+                                    massagingFingerTip.x,
+                                    massagingFingerTip.y
+                                )) {
+                                    if (!isMassaging) {
+                                        isMassaging = true;
+                                        startTimer();
+                                    }
+                                    // 顯示按摩效果
+                                    ctx.beginPath();
+                                    ctx.arc(
+                                        targetHand[0].x * canvas.width,
+                                        targetHand[0].y * canvas.height,
+                                        20,
+                                        0,
+                                        2 * Math.PI
+                                    );
+                                    ctx.strokeStyle = '#00FF00';
+                                    ctx.lineWidth = 3;
+                                    ctx.stroke();
+                                } else {
+                                    if (isMassaging) {
+                                        isMassaging = false;
+                                        resetTimer();
+                                    }
+                                }
+                            }
+                        } else {
+                            // 手背朝向錯誤時同時隱藏穴位和文字
+                            palmNotification.style.display = 'block';
+                            acupointName.style.display = 'none';
+                        }
+                    }
+                } else {
+                    // 如果没有检测到目标手，隐藏文字和提示
+                    if (activeSymptom === "經痛穴位") {
+                        document.getElementById('acupoint-name').style.display = 'none';
+                        document.getElementById('palm-notification').style.display = 'block';
+                    }
+                }
+
+                // 添加牙齒痛穴位的處理邏輯
+                if (targetHand) {
+                    if (activeSymptom === "牙齒痛穴位") {
+                        // 檢查手掌朝向
+                        isPalmVisible = checkPalmVisibility(targetHand, selectedHand);
+                        const palmNotification = document.getElementById('palm-notification');
+                        const acupointName = document.getElementById('acupoint-name');
+                        
+                        if (isPalmVisible) {
+                            // 手掌朝向正確時同時顯示穴位和文字
+                            palmNotification.style.display = 'none';
+                            acupointName.textContent = "少府穴";
+                            acupointName.style.display = 'block';
+                            
+                            // 繪製少府穴
+                            ctx.beginPath();
+                            ctx.arc(
+                                targetHand[0].x * canvas.width,
+                                targetHand[0].y * canvas.height,
+                                8,
+                                0,
+                                2 * Math.PI
+                            );
+                            ctx.fillStyle = '#0000FF';
+                            ctx.fill();
+                            
+                            // 檢查按摩動作
+                            if (massagingFingerTip) {
+                                // 繪製按摩手指的黃點
+                                ctx.beginPath();
+                                ctx.arc(
+                                    massagingFingerTip.x * canvas.width,
+                                    massagingFingerTip.y * canvas.height,
+                                    6,
+                                    0,
+                                    2 * Math.PI
+                                );
+                                ctx.fillStyle = '#FFFF00';
+                                ctx.fill();
+
+                                // 檢查重合
+                                if (checkPointsOverlap(
+                                    targetHand[0].x,
+                                    targetHand[0].y,
+                                    massagingFingerTip.x,
+                                    massagingFingerTip.y
+                                )) {
+                                    if (!isMassaging) {
+                                        isMassaging = true;
+                                        startTimer();
+                                    }
+                                    // 顯示按摩效果
+                                    ctx.beginPath();
+                                    ctx.arc(
+                                        targetHand[0].x * canvas.width,
+                                        targetHand[0].y * canvas.height,
+                                        20,
+                                        0,
+                                        2 * Math.PI
+                                    );
+                                    ctx.strokeStyle = '#00FF00';
+                                    ctx.lineWidth = 3;
+                                    ctx.stroke();
+                                } else {
+                                    if (isMassaging) {
+                                        isMassaging = false;
+                                        resetTimer();
+                                    }
+                                }
+                            }
+                        } else {
+                            // 手掌朝向錯誤時同時隱藏穴位和文字
+                            palmNotification.style.display = 'block';
+                            acupointName.style.display = 'none';
+                        }
+                    }
+                } else {
+                    // 如果沒有檢測到手，也要隱藏文字
+                    if (activeSymptom === "牙齒痛穴位") {
+                        document.getElementById('acupoint-name').style.display = 'none';
+                        document.getElementById('palm-notification').style.display = 'block';
+                    }
+                }
+            }
+        });
+
+        // ===== 相機初始化 =====
+        async function startCamera() {
+            try {
+                // iOS 必要屬性設置
+                video.setAttribute('playsinline', '');
+                video.setAttribute('webkit-playsinline', '');
+                video.setAttribute('autoplay', '');
+                video.setAttribute('muted', '');
+
+                // 檢測是否為 iOS 設備
+                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+                
+                // 根據設備設置最佳解析度和比例
+                const constraints = {
+                    video: {
+                        facingMode: 'user',
+                        width: { ideal: isIOS ? 720 : 1280 },
+                        height: { ideal: isIOS ? 1280 : 720 },
+                        frameRate: { ideal: 30 },
+                        aspectRatio: { ideal: isIOS ? 9/16 : 16/9 }
+                    }
+                };
+
+                // 檢查是否已經有相機權限
+                if (!video.srcObject) {
+                    const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                    video.srcObject = stream;
+                }
+
+                // 初始化 canvas
+                setupCanvas();
+                
+                // 初始化相機
+                if (!window.cameraInitialized) {
+                    const camera = new Camera(video, {
+                        onFrame: async () => {
+                            await hands.send({image: video});
+                        },
+                        width: isIOS ? 720 : 1280,
+                        height: isIOS ? 1280 : 720
+                    });
+                    await camera.start();
+                    window.cameraInitialized = true;
+                }
+
+            } catch (err) {
+                console.error('相機初始化錯誤:', err);
+            }
+        }
+
+        startCamera();
+
+        // 修改清除函數，確保同時清除內聯樣式和類別
+        function clearAllPoints() {
+            showFatiguePoint = false;
+            showPericardiumPoints = false;
+            activeSymptom = null;
+            isMassaging = false;
+            selectedHand = null;
+            document.getElementById('acupoint-name').style.display = 'none';
+            document.getElementById('timer').style.display = 'none';
+            document.getElementById('massage-complete').style.display = 'none';
+            
+            // 重置所有按鈕樣式
+            document.querySelectorAll('.option-btn, .hand-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.style.backgroundColor = '#f5f5f5';
+                btn.style.color = '#333';
+            });
+        }
+
+        // 更新按鈕事件處理
+        const symptomBtn = document.querySelector('.symptom-btn');
+        const meridianBtn = document.querySelector('.meridian-btn');
+        const symptomOptions = document.getElementById('symptom-options');
+        const meridianOptions = document.getElementById('meridian-options');
+
+        symptomBtn.addEventListener('click', () => {
+            clearAllPoints();
+            isMeridianLearningMode = false;
+            
+            // 顯示症狀選單
+            symptomOptions.style.display = 'block';
+            setTimeout(() => {
+                symptomOptions.classList.add('active');
+            }, 10);
+            
+            // 關閉其他選單
+            meridianOptions.classList.remove('active');
+            setTimeout(() => {
+                meridianOptions.style.display = 'none';
+            }, 300);
+        });
+
+        meridianBtn.addEventListener('click', () => {
+            clearAllPoints();
+            isMeridianLearningMode = true;
+            
+            // 顯示經絡選單
+            meridianOptions.style.display = 'block';
+            setTimeout(() => {
+                meridianOptions.classList.add('active');
+            }, 10);
+            
+            // 關閉其他選單
+            symptomOptions.classList.remove('active');
+            setTimeout(() => {
+                symptomOptions.style.display = 'none';
+            }, 300);
+        });
+
+        // 修改症狀按鈕點擊事件
+        document.querySelectorAll('.option-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                // 只清除症狀按鈕的樣式，保留手部選擇按鈕的樣式
+                document.querySelectorAll('.option-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    btn.style.backgroundColor = '#f5f5f5';
+                    btn.style.color = '#333';
+                });
+                
+                // 重置狀態但保留手部選擇
+                showFatiguePoint = false;
+                showPericardiumPoints = false;
+                activeSymptom = null;
+                isMassaging = false;
+                document.getElementById('acupoint-name').style.display = 'none';
+                document.getElementById('timer').style.display = 'none';
+                document.getElementById('massage-complete').style.display = 'none';
+                document.getElementById('palm-notification').style.display = 'none';
+                
+                const acupoint = this.dataset.acupoint;
+                if (acupoint === "魚際穴") {
+                    activeSymptom = "魚際穴";
+                    isMassaging = true;
+                    document.getElementById('palm-notification').textContent = "請將手掌心朝向鏡頭";
+                    document.getElementById('palm-notification').style.display = 'block';
+                    
+                    this.style.backgroundColor = '#78A6C8';
+                    this.style.color = 'white';
+                    this.classList.add('active');
+                } else if (this.textContent === '疲勞') {
+                    showFatiguePoint = true;
+                    activeSymptom = "勞宮穴";
+                    document.getElementById('acupoint-name').textContent = "勞宮穴";
+                    document.getElementById('acupoint-name').style.display = 'block';
+                    isMassaging = true;
+                    document.getElementById('palm-notification').textContent = "請將手掌心朝向鏡頭";
+                    document.getElementById('palm-notification').style.display = 'block';
+                    
+                    this.style.backgroundColor = '#78A6C8';
+                    this.style.color = 'white';
+                    this.classList.add('active');
+                } else if (this.textContent === '頭痛') {
+                    activeSymptom = "頭痛穴位";
+                    isMassaging = true;
+                    document.getElementById('palm-notification').textContent = "請將手背朝向鏡頭";
+                    document.getElementById('palm-notification').style.display = 'block';
+                    
+                    this.style.backgroundColor = '#78A6C8';
+                    this.style.color = 'white';
+                    this.classList.add('active');
+                } else if (this.textContent === '經痛') {
+                    activeSymptom = "經痛穴位";
+                    isMassaging = true;
+                    document.getElementById('palm-notification').textContent = "請將手背朝向鏡頭";
+                    document.getElementById('palm-notification').style.display = 'block';
+                    
+                    this.style.backgroundColor = '#78A6C8';
+                    this.style.color = 'white';
+                    this.classList.add('active');
+                // } else if (this.textContent === '頭暈') {
+                //     activeSymptom = "頭暈穴位";
+                //     isMassaging = true;
+                //     document.getElementById('palm-notification').textContent = "請將手背朝向鏡頭";
+                //     document.getElementById('palm-notification').style.display = 'block';
+                    
+                //     this.style.backgroundColor = '#78A6C8';
+                //     this.style.color = 'white';
+                //     this.classList.add('active');
+                } else if (this.textContent === '牙齒痛') {
+                    activeSymptom = "牙齒痛穴位";
+                    isMassaging = true;
+                    document.getElementById('palm-notification').textContent = "請將手掌心朝向鏡頭";
+                    document.getElementById('palm-notification').style.display = 'block';
+                    
+                    this.style.backgroundColor = '#78A6C8';
+                    this.style.color = 'white';
+                    this.classList.add('active');
+                }
+            });
+        });
+
+        // 修改手部選擇按鈕點擊事件
+        document.querySelectorAll('.hand-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                clearAllPoints();
+                activeHand = e.target.dataset.hand;
+                selectedHand = e.target.dataset.hand;  // 設置 selectedHand
+                
+                // 更新按鈕樣式
+                document.querySelectorAll('.hand-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    btn.style.backgroundColor = '#f5f5f5';  // 重置為預設背景色
+                    btn.style.color = '#333';  // 重置為預設文字顏色
+                });
+                
+                // 設置選中按鈕的樣式
+                e.target.classList.add('active');
+                e.target.style.backgroundColor = '#78A6C8';  // 使用主題藍色
+                e.target.style.color = 'white';  // 文字改為白色
+
+                // 顯示症狀列表
+                document.querySelector('.symptom-list').style.display = 'block';
+                
+                // 確保掌心提示詞不顯示
+                document.getElementById('palm-notification').style.display = 'none';
+            });
+        });
+
+        // 點擊其他地方時也清除所有點
+        document.addEventListener('click', (event) => {
+            if (!event.target.closest('.options-menu') && 
+                !event.target.closest('.btn')) {
+                clearAllPoints();
+                symptomOptions.style.display = 'none';
+                meridianOptions.style.display = 'none';
+            }
+        });
+
+        // 計時器函數
+        function startTimer() {
+            if (!isTimerRunning) {
+                isTimerRunning = true;
+                currentTime = 3;
+                const timerElement = document.getElementById('timer');
+                const massageComplete = document.getElementById('massage-complete');
+                timerElement.style.display = 'block';
+                timerElement.textContent = currentTime;
+
+                timerInterval = setInterval(() => {
+                    currentTime--;
+                    timerElement.textContent = currentTime;
+
+                    if (currentTime <= 0) {
+                        clearInterval(timerInterval);
+                        isTimerRunning = false;
+                        timerElement.style.display = 'none';
+                        // 顯示按摩結束提示
+                        massageComplete.style.display = 'flex';
+                        setTimeout(() => {
+                            massageComplete.style.display = 'none';
+                        }, 2000); // 2秒後隱藏提示
+                    }
+                }, 1000);
+            }
+        }
+
+        // 重置計時器
+        function resetTimer() {
+            if (isTimerRunning) {
+                clearInterval(timerInterval);
+                isTimerRunning = false;
+                currentTime = 3;
+                document.getElementById('timer').style.display = 'none';
+            }
+        }
+
+        // 添加手掌朝向提示函數
+        function showPalmNotification(show) {
+            const palmNotification = document.getElementById('palm-notification');
+            if (show) {
+                palmNotification.style.display = 'block';
+            } else {
+                palmNotification.style.display = 'none';
+            }
+        }
+
+        // 修改經絡選擇按鈕的點擊事件
+        document.querySelectorAll('#meridian-options .option-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                // 清除其他按鈕的選中狀態
+                document.querySelectorAll('#meridian-options .option-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    btn.style.backgroundColor = '#f5f5f5';
+                    btn.style.color = '#333';
+                });
+
+                // 重置所有狀態
+                showFatiguePoint = false;
+                showPericardiumPoints = false;
+                activeSymptom = null;
+                isMassaging = false;
+
+                // 如果點擊的是手厥陰心包經
+                if (this.textContent === '手厥陰心包經') {
+                    showPericardiumPoints = true;
+                    isMeridianLearningMode = true;
+                    
+                    // 更新按鈕樣式
+                    this.style.backgroundColor = '#78A6C8';
+                    this.style.color = 'white';
+                    this.classList.add('active');
+                    
+                    // 顯示正確的手掌朝向提示
+                    const palmNotification = document.getElementById('palm-notification');
+                    palmNotification.textContent = "請將手掌心朝向鏡頭";
+                    palmNotification.style.display = 'block';
+                }
+            });
+        });
+
+        const maintainAspectRatio = () => {
+            const container = document.querySelector('.camera-container');
+            const containerWidth = container.offsetWidth;
+            const containerHeight = container.offsetHeight;
+            const videoAspectRatio = 16/9;
+            
+            let width, height;
+            if (containerWidth / containerHeight > videoAspectRatio) {
+                // 容器較寬，以高度為基準
+                height = containerHeight;
+                width = height * videoAspectRatio;
+            } else {
+                // 容器較高，以寬度為基準
+                width = containerWidth;
+                height = width / videoAspectRatio;
+            }
+
+            // 設置視訊和畫布的尺寸
+            [video, canvas].forEach(element => {
+                element.style.width = `${width}px`;
+                element.style.height = `${height}px`;
+                element.style.objectFit = 'contain';
+                // 計算居中位置
+                element.style.left = `${(containerWidth - width) / 2}px`;
+                element.style.top = `${(containerHeight - height) / 2}px`;
+            });
+        };
+
+        // ===== 新增抽屜控制功能 =====
+        const controlSection = document.querySelector('.control-section');
+        const drawerHandle = document.createElement('div');
+        drawerHandle.className = 'drawer-handle';
+        controlSection.insertBefore(drawerHandle, controlSection.firstChild);
+
+        let startY = 0;
+        let currentTranslate = 85;  // 初始隱藏位置的百分比
+
+        // 處理觸摸開始事件
+        drawerHandle.addEventListener('touchstart', (e) => {
+            startY = e.touches[0].clientY;
+            controlSection.style.transition = 'none';  // 移除過渡效果以實現流暢的拖動
+        }, { passive: true });  // 優化觸摸事件性能
+
+        // 處理觸摸移動事件
+        drawerHandle.addEventListener('touchmove', (e) => {
+            const deltaY = e.touches[0].clientY - startY;
+            const translateY = Math.max(0, Math.min(85, currentTranslate + (deltaY / window.innerHeight) * 100));
+            controlSection.style.transform = `translateY(${translateY}%)`;
+        }, { passive: true });
+
+        // 處理觸摸結束事件
+        drawerHandle.addEventListener('touchend', () => {
+            controlSection.style.transition = 'transform 0.3s ease';
+            currentTranslate = currentTranslate < 40 ? 0 : 85;
+            controlSection.style.transform = `translateY(${currentTranslate}%)`;
+        });
+
+        // 修改關閉按鈕功能
+        const addCloseButton = (menu) => {
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'close-menu-btn';
+            closeBtn.innerHTML = '×';
+            closeBtn.addEventListener('click', () => {
+                menu.classList.remove('active');
+                setTimeout(() => {
+                    menu.style.display = 'none';
+                }, 300);
+            });
+            menu.insertBefore(closeBtn, menu.firstChild);
+        };
+
+        // 為兩個選單添加關閉按鈕
+        addCloseButton(symptomOptions);
+        addCloseButton(meridianOptions);
+    </script>
+</body>
+</html> 
