@@ -142,7 +142,7 @@ main {
 /* 按鈕組位置 */
 .control-section {
     position: fixed;
-    right: 50px;
+    right: 70px;
     bottom: 20px;
     width: 230px;
     padding: 15px;
@@ -198,7 +198,7 @@ main {
 
 .options-menu {
     position: fixed;
-    right: 155px;
+    right: 180px;
     top: 50%;
     transform: translate(50%, -50%);
     display: flex;
