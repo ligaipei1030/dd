@@ -559,7 +559,7 @@ footer {
     .main-panel {
         width: 100%;
         max-width: 500px;
-        background: rgb(125, 122, 122);
+        background: rgb(255, 255, 255);
         border-radius: 10px;
         padding: 20px;
         box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -590,13 +590,13 @@ footer {
         margin-bottom: 20px;  /* 減少與按鈕的間距 */
     }
 
-    /* 按鈕區域 */
     .control-section {
-        position: relative;  /* 相對定位 */
-        width: 100%;         /* 佔滿父容器 */
-        margin-bottom: 30px; /* 與下方元素間距 */
-        text-align: center;  /* 讓內部元素水平置中 */
-    }    
+        position: relative;
+        width: fit-content; /* 讓寬度根據內容調整 */
+        margin: 0 auto;     /* 水平置中 */
+        margin-bottom: 30px;
+    }
+    
 
     /* 按鈕組 */
     .btn-group {
