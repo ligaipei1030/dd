@@ -67,6 +67,7 @@
                 </div>
                 <div class="symptom-list" style="display: none;">
                     <div class="options-title">症狀選擇</div>
+                    <button class="option-btn">疲勞</button>
                     <button class="option-btn">頭痛</button>
                     <button class="option-btn">牙齒痛</button>
                     <button class="option-btn" data-acupoint="魚際穴" data-location="yujixue">哮喘</button>
@@ -539,18 +540,27 @@
                             palmNotification.style.display = 'none';
                             acupointName.textContent = "液門穴";
                             acupointName.style.display = 'block';
-                            
-                            // 繪製頭痛穴位（液門穴）
+
+                            // 計算液門穴位置
+                            // 計算液門穴位置
+                            const point13 = targetHand[13];
+                            const point18 = targetHand[18];
+                            const point14 = targetHand[14];
+                            const point17 = targetHand[17];
+
+                            // 計算兩條線的中點
+                            const yemenPoint = {
+                                x: (point13.x + point18.x + point14.x + point17.x) / 4,
+                                y: (point13.y + point18.y + point14.y + point17.y) / 4
+                            };
+                        
+
+                            // 繪製液門穴
                             ctx.beginPath();
-                            ctx.arc(
-                                targetHand[13].x * canvas.width,
-                                targetHand[13].y * canvas.height,
-                                8,
-                                0,
-                                2 * Math.PI
-                            );
-                            ctx.fillStyle = '#0000FF';
+                            ctx.arc(yemenPoint.x * canvas.width, yemenPoint.y * canvas.height, 8, 0, 2 * Math.PI);
+                            ctx.fillStyle = '#0000FF';  // 藍色
                             ctx.fill();
+                            
                             
                             // 檢查按摩動作
                             if (massagingFingerTip) {

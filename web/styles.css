@@ -625,7 +625,7 @@ footer {
         display: flex;
         justify-content: center;  /* 水平置中 */
         align-items: center;      /* 垂直置中 */
-        padding: 0 20px;
+        padding: 0 50px;
     }
 
     /* 相機容器 */
