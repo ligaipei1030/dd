@@ -628,7 +628,7 @@ footer {
         padding: 0 20px;
     }
 
-    /* 相機容器 */
+    /* 相機容器  '框框*/
     .camera-container {
         width: 100%;
         max-width: 400px;        /* 限制最大寬度 */
@@ -637,7 +637,7 @@ footer {
         border-radius: 10px;
         overflow: hidden;
         position: relative;
-        border: 2px solid #3d12b4;
+        border: 2px solid #ecbb0b;
         margin: 0 auto;          /* 確保水平置中 */
     }
 
