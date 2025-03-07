@@ -593,10 +593,10 @@ footer {
         margin-bottom: 20px;  /* 減少與按鈕的間距 */
     }
 
+    /* 按鈕區域 */
     .control-section {
-        position: relative;
-        width: fit-content; /* 讓寬度根據內容調整 */
-        margin: 0 auto;     /* 水平置中 */
+        position: relative;  /* 改回相對定位 */
+        width: 100%;
         margin-bottom: 30px;
     }
     
@@ -641,7 +641,7 @@ footer {
         border-radius: 10px;
         overflow: hidden;
         position: relative;
-        border: 2px solid #4CAF50;
+        border: 2px solid #e00fd2;
         margin: 0 auto;          /* 確保水平置中 */
     }
 
