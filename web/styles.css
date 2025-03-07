@@ -603,7 +603,7 @@ footer {
         flex-direction: row;
         justify-content: center;
         gap: 20px;
-        padding: 0 20px;
+        padding: 0;
     }
 
     /* 按鈕樣式 */
@@ -621,8 +621,7 @@ footer {
 
     /* 相機區域 */
     .camera-section {
-        width: 80%;
-        border-radius: 10px;
+        width: 100%;
         display: flex;
         justify-content: center;  /* 水平置中 */
         align-items: center;      /* 垂直置中 */
