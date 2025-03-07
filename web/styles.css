@@ -198,7 +198,7 @@ main {
 
 .options-menu {
     position: fixed;
-    right: 180px;
+    right: 175px;
     top: 50%;
     transform: translate(50%, -50%);
     display: flex;
@@ -559,7 +559,7 @@ footer {
     .main-panel {
         width: 100%;
         max-width: 500px;
-        background: white;
+        background: rgb(125, 122, 122);
         border-radius: 10px;
         padding: 20px;
         box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -592,10 +592,11 @@ footer {
 
     /* 按鈕區域 */
     .control-section {
-        position: relative;  /* 改回相對定位 */
-        width: 100%;
-        margin-bottom: 30px;
-    }
+        position: relative;  /* 相對定位 */
+        width: 100%;         /* 佔滿父容器 */
+        margin-bottom: 30px; /* 與下方元素間距 */
+        text-align: center;  /* 讓內部元素水平置中 */
+    }    
 
     /* 按鈕組 */
     .btn-group {
@@ -603,7 +604,7 @@ footer {
         flex-direction: row;
         justify-content: center;
         gap: 20px;
-        padding: 0;
+        padding: 0 20px;
     }
 
     /* 按鈕樣式 */
@@ -613,7 +614,7 @@ footer {
         border-radius: 8px;
         font-size: 16px;
         text-align: center;
-        background: #376eaa;
+        background: #007bff;
         color: white;
         border: none;
         box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -628,7 +629,7 @@ footer {
         padding: 0 20px;
     }
 
-    /* 相機容器  '框框*/
+    /* 相機容器 */
     .camera-container {
         width: 100%;
         max-width: 400px;        /* 限制最大寬度 */
@@ -637,7 +638,7 @@ footer {
         border-radius: 10px;
         overflow: hidden;
         position: relative;
-        border: 2px solid #ecbb0b;
+        border: 2px solid #4CAF50;
         margin: 0 auto;          /* 確保水平置中 */
     }
 
