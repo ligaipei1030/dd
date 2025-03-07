@@ -621,7 +621,8 @@ footer {
 
     /* 相機區域 */
     .camera-section {
-        width: 100%;
+        width: 80%;
+        border-radius: 10px;
         display: flex;
         justify-content: center;  /* 水平置中 */
         align-items: center;      /* 垂直置中 */
